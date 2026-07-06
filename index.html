@@ -39,7 +39,6 @@
         #app-container {
             width: 100%;
             max-width: 800px;
-            /* Arka planı hafif şeffaf beyaz yaparak hem haritanın hem arkaplanın görünmesini sağladık */
             background: rgba(255, 255, 255, 0.95);
             padding: 20px;
             border-radius: 12px;
@@ -52,13 +51,24 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
-            gap: 20px;
+            gap: 15px;
             padding: 40px 0;
         }
 
+        .question-btn {
+            padding: 15px 40px;
+            font-size: 22px;
+            font-weight: bold;
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: default; /* Tıklanamaz imleç */
+        }
+
         .ready-btn {
-            padding: 20px 50px;
-            font-size: 24px;
+            padding: 20px 60px;
+            font-size: 26px;
             font-weight: bold;
             background-color: var(--correct);
             color: white;
@@ -67,6 +77,7 @@
             cursor: pointer;
             transition: transform 0.2s, background 0.3s;
             box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+            margin-top: 10px;
         }
 
         .ready-btn:hover {
@@ -98,11 +109,11 @@
         }
 
         /* Özel Kategori Renkleri */
-        .btn-daglar { background-color: #8B4513; }      /* Kahverengi */
-        .btn-ovalar { background-color: #27ae60; }      /* Yeşil */
-        .btn-platolar { background-color: #d35400; }    /* Turuncu */
-        .btn-akarsular { background-color: #2980b9; }   /* Mavi */
-        .btn-goller { background-color: #191970; }      /* Koyu Mavi (MidnightBlue) */
+        .btn-daglar { background-color: #8B4513; }      
+        .btn-ovalar { background-color: #27ae60; }      
+        .btn-platolar { background-color: #d35400; }    
+        .btn-akarsular { background-color: #2980b9; }   
+        .btn-goller { background-color: #191970; }      
 
         /* Oyun Ekranı */
         #game-screen {
@@ -244,7 +255,10 @@
         <!-- Başlangıç Ekranı -->
         <div id="start-screen">
             <h2>Türkiye Coğrafyasını Keşfetmeye</h2>
-            <button class="ready-btn" onclick="showMenu()">Hazır Mısın?</button>
+            <!-- "Hazır Mısın?" butonu artık sadece görsel bir element, tıklanmıyor -->
+            <button class="question-btn" disabled>Hazır mısın?</button>
+            <!-- Oyunu (Menüyü) başlatan asıl buton -->
+            <button class="ready-btn" onclick="showMenu()">EVET</button>
         </div>
 
         <!-- Menü Ekranı -->
@@ -378,7 +392,7 @@
         const marker = document.getElementById('marker');
         const nextBtn = document.getElementById('next-btn');
 
-        // Menüyü Göster ("Hazır Mısın" veya "Menüye Dön" sonrası)
+        // Menüyü Göster ("Evet" veya "Menüye Dön" sonrası)
         function showMenu() {
             startScreen.style.display = 'none';
             gameScreen.style.display = 'none';
@@ -455,16 +469,4 @@
                 loadQuestion();
             } else {
                 endGame();
-            }
-        }
-
-        // Puan Tablosunu Güncelle
-        function updateScoreBoard() {
-            document.getElementById('score-display').innerText = 
-                `Soru: ${currentIndex + 1}/${currentQuestions.length} | Puan: ${score}`;
-        }
-
-        // Oyunu Bitir
-        function endGame() {
-            gameScreen.style.display = 'none';
- 
+        

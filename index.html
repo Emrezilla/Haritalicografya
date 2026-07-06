@@ -172,7 +172,7 @@
             position: relative;
             width: 100%;
             background-image: url('renkli.png');
-            background-size: 100% 100%;
+            background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             aspect-ratio: 2.50 / 1;
@@ -607,6 +607,17 @@
             resultScreen.style.display = 'flex';
             document.getElementById('final-score').innerText = `Toplam Puanınız: ${score}`;
         }
+        // HARİTAYA TIKLAYARAK KOORDİNAT BULMA ARACI (Geliştirme aşaması için)
+document.getElementById('map-container').addEventListener('click', function(e) {
+    const rect = this.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    
+    // Tıkladığınız yerin koordinatlarını ekranda uyarı olarak gösterir
+    alert(`Bu noktanın koordinatı:\nx: ${x.toFixed(1)}, y: ${y.toFixed(1)}`);
+    console.log(`x: ${x.toFixed(1)}, y: ${y.toFixed(1)}`);
+});
+
     </script>
 </body>
 </html>

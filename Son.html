@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Türkiye Coğrafyası Oyunu</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #3498db;
+            --correct: #2ecc71;
+            --wrong: #e74c3c;
+            --light: #ecf0f1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light);
+            color: var(--primary);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Menü Ekranı */
+        #menu-screen {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .category-btn {
+            padding: 15px;
+            font-size: 18px;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .category-btn:hover {
+            background-color: #2980b9;
+        }
+
+        /* Oyun Ekranı */
+        #game-screen {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* Harita Alanı */
+        #map-container {
+            position: relative;
+            width: 100%;
+            /* Harita görseli olarak Wikimedia'dan boş Türkiye haritası kullanıldı */
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Turkey_location_map.svg/800px-Turkey_location_map.svg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            aspect-ratio: 2.15 / 1; /* Türkiye haritası orantısı */
+            border: 2px solid var(--secondary);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        #marker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: var(--wrong);
+            border: 2px solid white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(231, 76, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+
+        /* Şıklar (2x2 Grid) */
+        #options-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .option-btn {
+            padding: 15px;
+            font-size: 16px;
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover {
+            background-color: var(--primary);
+        }
+
+        .option-btn.correct { background-color: var(--correct) !important; }
+        .option-btn.wrong { background-color: var(--wrong) !important; }
+        
+        .option-btn:disabled { cursor: not-allowed; }
+
+        /* Sonuç Ekranı */
+        #result-screen {
+            display: none;
+            text-align: center;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .home-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Türkiye Coğrafyası Oyunu</h1>
+
+    <div id="app-container">
+        <!-- Menü Ekranı -->
+        <div id="menu-screen">
+            <h2>Kategori Seçiniz</h2>
+            <button class="category-btn" onclick="startGame('daglar')">Dağlar (10 Soru)</button>
+            <button class="category-btn" onclick="startGame('ovalar')">Ovalar (10 Soru)</button>
+            <button class="category-btn" onclick="startGame('platolar')">Platolar (10 Soru)</button>
+            <button class="category-btn" onclick="startGame('goller')">Göller (10 Soru)</button>
+            <button class="category-btn" onclick="startGame('akarsular')">Akarsular (10 Soru)</button>
+        </div>
+
+        <!-- Oyun Ekranı -->
+        <div id="game-screen">
+            <div class="header">
+                <span id="category-title">Kategori</span>
+                <span id="score-display">Soru: 1/1 | Puan: 0</span>
+            </div>
+            
+            <div id="map-container">
+                <div id="marker"></div>
+            </div>
+
+            <div id="options-container">
+                <button class="option-btn" onclick="checkAnswer(0)" id="btn0">Seçenek 1</button>
+                <button class="option-btn" onclick="checkAnswer(1)" id="btn1">Seçenek 2</button>
+                <button class="option-btn" onclick="checkAnswer(2)" id="btn2">Seçenek 3</button>
+                <button class="option-btn" onclick="checkAnswer(3)" id="btn3">Seçenek 4</button>
+            </div>
+            
+            <button class="home-btn" id="next-btn" style="display:none; margin-top:10px;" onclick="nextQuestion()">Sonraki Soru</button>
+        </div>
+
+        <!-- Sonuç Ekranı -->
+        <div id="result-screen">
+            <h2>Oyun Bitti!</h2>
+            <h3 id="final-score">Puanınız: 0</h3>
+            <button class="home-btn" onclick="showMenu()">Ana Menüye Dön</button>
+        </div>
+    </div>
+
+    <script>
+        // Genişletilmiş Veritabanı
+        const db = {
+            daglar: [
+                { answer: "Ağrı Dağı", x: 94, y: 35, options: ["Erciyes Dağı", "Ağrı Dağı", "Süphan Dağı", "Kaçkar Dağı"] },
+                { answer: "Erciyes Dağı", x: 58, y: 54, options: ["Hasan Dağı", "Uludağ", "Erciyes Dağı", "Nemrut Dağı"] },
+                { answer: "Uludağ", x: 24, y: 32, options: ["Uludağ", "Kaz Dağları", "Ilgaz Dağları", "Toroslar"] },
+                { answer: "Kaçkar Dağları", x: 80, y: 22, options: ["Canik Dağları", "Kaçkar Dağları", "Küre Dağları", "Yalnızçam"] },
+                { answer: "Süphan Dağı", x: 88, y: 45, options: ["Tendürek Dağı", "Palandöken", "Süphan Dağı", "Cilo Dağı"] },
+                { answer: "Cilo (Buzul) Dağı", x: 93, y: 65, options: ["Cudi Dağı", "Güneydoğu Toroslar", "Cilo (Buzul) Dağı", "Nemrut Dağı"] },
+                { answer: "Kaz Dağları", x: 14, y: 38, options: ["Madra Dağı", "Yunt Dağı", "Aydın Dağları", "Kaz Dağları"] },
+                { answer: "Ilgaz Dağları", x: 46, y: 22, options: ["Ilgaz Dağları", "Köse Dağları", "Bozdağlar", "Menteşe Dağları"] },
+                { answer: "Aladağlar", x: 58, y: 65, options: ["Bolkarlar", "Aladağlar", "Tahtalı Dağları", "Binboğa Dağları"] },
+                { answer: "Nur (Amanos) Dağları", x: 62, y: 78, options: ["Nur (Amanos) Dağları", "Aladağlar", "Tahtalı", "Samanlı Dağları"] }
+            ],
+            ovalar: [
+                { answer: "Çukurova", x: 58, y: 78, options: ["Bafra Ovası", "Çukurova", "Gediz Ovası", "Harran Ovası"] },
+                { answer: "Konya Ovası", x: 45, y: 60, options: ["Muş Ovası", "Ergene Ovası", "Çarşamba Ovası", "Konya Ovası"] },
+                { answer: "Bafra Ovası", x: 55, y: 15, options: ["Çarşamba Ovası", "Bafra Ovası", "Sakarya Ovası", "Adapazarı Ovası"] },
+                { answer: "Çarşamba Ovası", x: 60, y: 17, options: ["Bafra Ovası", "Meriç Ovası", "Çarşamba Ovası", "Gediz Ovası"] },
+                { answer: "Harran Ovası", x: 75, y: 75, options: ["Ceylanpınar Ovası", "Suruç Ovası", "Altınbaşak", "Harran Ovası"] },
+                { answer: "Ergene Ovası", x: 10, y: 20, options: ["Ergene Ovası", "Bursa Ovası", "Karacabey Ovası", "Balıkesir Ovası"] },
+                { answer: "Iğdır Ovası", x: 95, y: 32, options: ["Muş Ovası", "Elbistan Ovası", "Iğdır Ovası", "Malatya Ovası"] },
+                { answer: "Gediz Ovası", x: 15, y: 48, options: ["Bakırçay Ovası", "Gediz Ovası", "Büyük Menderes", "Küçük Menderes"] },
+                { answer: "Muş Ovası", x: 82, y: 50, options: ["Erzincan Ovası", "Tercan Ovası", "Muş Ovası", "Pasinler Ovası"] },
+                { answer: "Amik Ovası", x: 62, y: 82, options: ["Amik Ovası", "Çukurova", "Silifke Ovası", "Antalya Ovası"] }
+            ],
+            platolar: [
+                { answer: "Haymana Platosu", x: 42, y: 45, options: ["Haymana Platosu", "Bozok Platosu", "Obruk Platosu", "Taşeli Platosu"] },
+                { answer: "Cihanbeyli Platosu", x: 45, y: 52, options: ["Uzunyayla", "Cihanbeyli Platosu", "Obruk", "Yazılıkaya"] },
+                { answer: "Obruk Platosu", x: 50, y: 55, options: ["Haymana", "Cihanbeyli", "Obruk Platosu", "Bozok"] },
+                { answer: "Bozok Platosu", x: 55, y: 42, options: ["Bozok Platosu", "Uzunyayla", "Gaziantep Platosu", "Şanlıurfa Platosu"] },
+                { answer: "Uzunyayla Platosu", x: 65, y: 50, options: ["Erzurum-Kars", "Ardahan Platosu", "Uzunyayla Platosu", "Bozok"] },
+                { answer: "Erzurum-Kars Platosu", x: 85, y: 25, options: ["Teke Platosu", "Çatalca-Kocaeli", "Erzurum-Kars Platosu", "Uzunyayla"] },
+                { answer: "Çatalca-Kocaeli Platosu", x: 25, y: 20, options: ["Çatalca-Kocaeli Platosu", "Yazılıkaya", "Teke", "Taşeli"] },
+                { answer: "Teke Platosu", x: 35, y: 75, options: ["Taşeli Platosu", "Teke Platosu", "Obruk", "Haymana"] },
+                { answer: "Taşeli Platosu", x: 45, y: 75, options: ["Teke Platosu", "Taşeli Platosu", "Cihanbeyli", "Uzunyayla"] },
+                { answer: "Yazılıkaya Platosu", x: 30, y: 45, options: ["Çatalca-Kocaeli", "Bozok", "Obruk", "Yazılıkaya Platosu"] }
+            ],
+            goller: [
+                { answer: "Van Gölü", x: 88, y: 52, options: ["Tuz Gölü", "Eğirdir Gölü", "Van Gölü", "Beyşehir Gölü"] },
+                { answer: "Tuz Gölü", x: 48, y: 52, options: ["Tuz Gölü", "Burdur Gölü", "İznik Gölü", "Bafa Gölü"] },
+                { answer: "Beyşehir Gölü", x: 38, y: 62, options: ["Eğirdir Gölü", "Beyşehir Gölü", "Akşehir Gölü", "Eber Gölü"] },
+                { answer: "Eğirdir Gölü", x: 35, y: 60, options: ["Burdur Gölü", "Salda Gölü", "Eğirdir Gölü", "Acıgöl"] },
+                { answer: "İznik Gölü", x: 26, y: 28, options: ["İznik Gölü", "Sapanca Gölü", "Uluabat Gölü", "Kuş (Manyas) Gölü"] },
+                { answer: "Burdur Gölü", x: 32, y: 65, options: ["Salda Gölü", "Burdur Gölü", "Eğirdir", "Beyşehir"] },
+                { answer: "Çıldır Gölü", x: 90, y: 18, options: ["Nemrut Gölü", "Erçek Gölü", "Nazik Gölü", "Çıldır Gölü"] },
+                { answer: "Sapanca Gölü", x: 28, y: 25, options: ["Uluabat", "İznik", "Sapanca Gölü", "Terkos"] },
+                { answer: "Bafa (Çamiçi) Gölü", x: 18, y: 60, options: ["Köyceğiz Gölü", "Bafa (Çamiçi) Gölü", "Salda Gölü", "Marmara Gölü"] },
+                { answer: "Salda Gölü", x: 30, y: 68, options: ["Salda Gölü", "Burdur Gölü", "Acıgöl", "Eğirdir"] }
+            ],
+            akarsular: [
+                { answer: "Kızılırmak", x: 55, y: 35, options: ["Yeşilırmak", "Fırat", "Kızılırmak", "Menderes"] },
+                { answer: "Yeşilırmak", x: 62, y: 25, options: ["Kızılırmak", "Çoruh", "Yeşilırmak", "Sakarya"] },
+                { answer: "Fırat Nehri", x: 72, y: 55, options: ["Dicle", "Çoruh", "Seyhan", "Fırat Nehri"] },
+                { answer: "Dicle Nehri", x: 82, y: 65, options: ["Fırat Nehri", "Dicle Nehri", "Zap Suyu", "Aras"] },
+                { answer: "Seyhan Nehri", x: 58, y: 70, options: ["Ceyhan Nehri", "Göksu", "Asi", "Seyhan Nehri"] },
+                { answer: "Sakarya Nehri", x: 35, y: 30, options: ["Susurluk", "Sakarya Nehri", "Kızılırmak", "Gediz"] },
+                { answer: "Meriç Nehri", x: 5, y: 20, options: ["Ergene", "Meriç Nehri", "Susurluk", "Bakırçay"] },
+                { answer: "Çoruh Nehri", x: 82, y: 18, options: ["Kura", "Aras", "Çoruh Nehri", "Yeşilırmak"] },
+                { answer: "Büyük Menderes", x: 20, y: 55, options: ["Küçük Menderes", "Büyük Menderes", "Gediz", "Bakırçay"] },
+                { answer: "Aras Nehri", x: 92, y: 25, options: ["Kura Nehri", "Aras Nehri", "Dicle", "Çoruh"] }
+            ]
+        };
+
+        const categoryNames = {
+            daglar: "Dağlar",
+            ovalar: "Ovalar",
+            platolar: "Platolar",
+            goller: "Göller",
+            akarsular: "Akarsular"
+        };
+
+        // Oyun Değişkenleri
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let score = 0;
+
+        // Ekran elementleri
+        const menuScreen = document.getElementById('menu-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const marker = document.getElementById('marker');
+        const nextBtn = document.getElementById('next-btn');
+
+        function startGame(category) {
+            currentQuestions = [...db[category]];
+            // Soruları karıştır
+            currentQuestions.sort(() => Math.random() - 0.5);
+            
+            currentIndex = 0;
+            score = 0;
+            
+            document.getElementById('category-title').innerText = categoryNames[category];
+            
+            menuScreen.style.display = 'none';
+            resultScreen.style.display = 'none';
+            gameScreen.style.display = 'flex';
+            
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            nextBtn.style.display = 'none';
+            const q = currentQuestions[currentIndex];
+            
+            // Marker'ı konumlandır
+            marker.style.left = q.x + '%';
+            marker.style.top = q.y + '%';
+
+            // Şıkları karıştır
+            let shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+            // Doğru cevabın indexini yeni sıralamaya göre bul
+            q.correctIndex = shuffledOptions.indexOf(q.answer);
+
+            // Butonlara şıkları yazdır ve renkleri sıfırla
+            for(let i=0; i<4; i++) {
+                const btn = document.getElementById('btn' + i);
+                btn.innerText = shuffledOptions[i];
+                btn.className = 'option-btn'; // Classları sıfırla
+                btn.disabled = false; // Tıklanabilir yap
+            }
+            
+            updateScoreBoard();
+        }
+
+        function checkAnswer(selectedIndex) {
+            const q = currentQuestions[currentIndex];
+            const isCorrect = (selectedIndex === q.correctIndex);
+            
+            const selectedBtn = document.getElementById('btn' + selectedIndex);
+            const correctBtn = document.getElementById('btn' + q.correctIndex);
+
+            // Bütün butonları kilitle
+            for(let i=0; i<4; i++) {
+                document.getElementById('btn' + i).disabled = true;
+            }
+
+            if (isCorrect) {
+                selectedBtn.classList.add('correct');
+                score += 10;
+            } else {
+                selectedBtn.classList.add('wrong');
+                correctBtn.classList.add('correct'); // Doğruyu göster
+            }
+            
+            updateScoreBoard();
+            nextBtn.style.display = 'block'; // Sonraki butonunu göster
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            if (currentIndex < currentQuestions.length) {
+                loadQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function updateScoreBoard() {
+            document.getElementById('score-display').innerText = 
+                `Soru: ${currentIndex + 1}/${currentQuestions.length} | Puan: ${score}`;
+        }
+
+        function endGame() {
+            gameScreen.style.display = 'none';
+            resultScreen.style.display = 'flex';
+            document.getElementById('final-score').innerText = `Toplam Puanınız: ${score}`;
+        }
+
+        function showMenu() {
+            resultScreen.style.display = 'none';
+            menuScreen.style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
+

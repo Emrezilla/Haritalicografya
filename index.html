@@ -438,8 +438,7 @@
         <div id="leaderboard-panel">
             <h3>Puan Tablosu</h3>
             <div id="leaderboard-list">
-                <!-- Skorlar buraya JS ile eklenecek -->
-            </div>
+                </div>
             <div style="text-align: center; margin-top: 10px;">
                 <button class="home-btn" style="padding: 5px 10px; font-size: 12px;" onclick="toggleLeaderboard()">Kapat</button>
             </div>
@@ -503,7 +502,7 @@
             <h3 id="final-score" style="font-size: 24px;">Puanınız: 0</h3>
             
             <input type="text" id="username-input" class="username-input" placeholder="Adınızı giriniz..." maxlength="15">
-            <button class="home-btn" onclick="saveScore()" style="margin-top: 10px; background-color: var(--correct);">Kaydet ve Menüye Dön</button>
+            <button class="home-btn" onclick="saveScore()" style="margin-top: 10px; background-color: var(--correct);">Skoru Kaydet ve Menüye Dön</button>
         </div>
     </div>
 
@@ -512,16 +511,14 @@
         <a href="mailto:emrenel1052@gmail.com">✉️ emrenel1052@gmail.com</a>
     </div>
 
-    <!-- Tırnak içindeki type="module" çok önemlidir, Firebase v12 sadece modüler çalışır -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
-        // Veritabanı işlemleri için gerekli fonksiyonları dahil ediyoruz
-        import { getDatabase, ref, onValue, get, set, update } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
+        // Senin Firebase yapılandırman
         const firebaseConfig = {
-            // GitHub tarama uyarısını atlatmak için apiKey iki string halinde birleştirildi
-            apiKey: "AIzaSyCYDppW_7Fy3s" + "QNY-YHv0xJyFmAy8qiL-I",
+            apiKey: "AIzaSyCYDppW_7Fy3sQNY-YHv0xJyFmAy8qiL-I",
             authDomain: "haritalarlacografya-322de.firebaseapp.com",
             projectId: "haritalarlacografya-322de",
             storageBucket: "haritalarlacografya-322de.firebasestorage.app",
@@ -532,8 +529,9 @@
 
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
-        const database = getDatabase(app);
+        const db = getFirestore(app);
 
+        // --- SES VE MÜZİK AYARLARI ---
         const clickSound = new Audio('menuses.mp3'); 
         const correctSound = new Audio('dogrucevap.mp3'); 
         const wrongSound = new Audio('yanliscevap.mp3'); 
@@ -546,8 +544,7 @@
         let isSoundOn = true;
         let gameStarted = false;
 
-        // Modüler yapıda HTML'den fonksiyon çağrılabilmesi için 'window' objesine eklenir
-        window.toggleSettings = function() {
+        function toggleSettings() {
             const panel = document.getElementById('settings-panel');
             if (panel.style.display === 'none' || panel.style.display === '') {
                 panel.style.display = 'block';
@@ -555,9 +552,9 @@
             } else {
                 panel.style.display = 'none';
             }
-        };
+        }
 
-        window.toggleMusic = function() {
+        function toggleMusic() {
             isMusicOn = !isMusicOn;
             const btn = document.getElementById('music-btn');
             if(isMusicOn) {
@@ -569,9 +566,9 @@
                 btn.classList.add('off');
                 bgMusic.pause();
             }
-        };
+        }
 
-        window.toggleSound = function() {
+        function toggleSound() {
             isSoundOn = !isSoundOn;
             const btn = document.getElementById('sound-btn');
             if(isSoundOn) {
@@ -581,7 +578,7 @@
                 btn.innerText = "🔇 Sesler: Kapalı";
                 btn.classList.add('off');
             }
-        };
+        }
 
         function playSound(sound) {
             if(!isSoundOn) return;
@@ -599,7 +596,8 @@
             bgMusic.pause();
         }
 
-        const db = {
+        // --- VERİTABANI ---
+        const mapDB = {
             daglar: [
                 { answer: "Ağrı Dağı", type: "volkanik", x: 88.0, y: 40.0, options: ["Tecer", "Ağrı Dağı", "Ilgaz Dağı", "Kaçkar Dağı"] },
                 { answer: "Erciyes Dağı", type: "volkanik", x: 50.0, y: 57.5, options: ["Hasan Dağı", "Uludağ", "Süphan Dağı", "Erciyes Dağı"] },
@@ -747,43 +745,30 @@
         };
 
         const categoryNames = {
-            daglar: "Dağlar",
-            ovalar: "Ovalar",
-            platolar: "Platolar",
-            goller: "Göller",
-            akarsular: "Akarsular"
+            daglar: "Dağlar", ovalar: "Ovalar", platolar: "Platolar",
+            goller: "Göller", akarsular: "Akarsular"
         };
 
         const subCategories = {
             daglar: [
-                { id: 'kivrimli', name: 'Kıvrımlı Dağlar' },
-                { id: 'kirik', name: 'Kırık Dağlar' },
-                { id: 'volkanik', name: 'Volkanik Dağlar' },
-                { id: 'all', name: 'Tüm Dağlar (Karma)' }
+                { id: 'kivrimli', name: 'Kıvrımlı Dağlar' }, { id: 'kirik', name: 'Kırık Dağlar' },
+                { id: 'volkanik', name: 'Volkanik Dağlar' }, { id: 'all', name: 'Tüm Dağlar (Karma)' }
             ],
             ovalar: [
-                { id: 'tektonik', name: 'Tektonik Ovalar' },
-                { id: 'karstik', name: 'Karstik Ovalar' },
-                { id: 'delta', name: 'Delta Ovaları' },
-                { id: 'volkanik', name: 'Volkanik Ovalar' },
+                { id: 'tektonik', name: 'Tektonik Ovalar' }, { id: 'karstik', name: 'Karstik Ovalar' },
+                { id: 'delta', name: 'Delta Ovaları' }, { id: 'volkanik', name: 'Volkanik Ovalar' },
                 { id: 'all', name: 'Tüm Ovalar (Karma)' }
             ],
             platolar: [
-                { id: 'asinim', name: 'Aşınım Platoları' },
-                { id: 'volkanik', name: 'Volkanik Platolar' },
-                { id: 'tabaka', name: 'Tabaka Düzlüğü' },
-                { id: 'karstik', name: 'Karstik Platolar' },
+                { id: 'asinim', name: 'Aşınım Platoları' }, { id: 'volkanik', name: 'Volkanik Platolar' },
+                { id: 'tabaka', name: 'Tabaka Düzlüğü' }, { id: 'karstik', name: 'Karstik Platolar' },
                 { id: 'all', name: 'Tüm Platolar (Karma)' }
             ],
             goller: [
-                { id: 'tektonik', name: 'Tektonik Göller' },
-                { id: 'heyelan', name: 'Heyelan Göller' },
-                { id: 'karstik', name: 'Karstik Göller' },
-                { id: 'volkanik', name: 'Volkanik Göller' },
-                { id: 'buzul', name: 'Buzul Göller' },
-                { id: 'set', name: 'Set Gölleri' },
-                { id: 'karma', name: 'Karma Oluşumlu Göller' },
-                { id: 'all', name: 'Tüm Göller (Karma)' }
+                { id: 'tektonik', name: 'Tektonik Göller' }, { id: 'heyelan', name: 'Heyelan Göller' },
+                { id: 'karstik', name: 'Karstik Göller' }, { id: 'volkanik', name: 'Volkanik Göller' },
+                { id: 'buzul', name: 'Buzul Göller' }, { id: 'set', name: 'Set Gölleri' },
+                { id: 'karma', name: 'Karma Oluşumlu Göller' }, { id: 'all', name: 'Tüm Göller (Karma)' }
             ]
         };
 
@@ -800,10 +785,40 @@
         const marker = document.getElementById('marker');
         const nextBtn = document.getElementById('next-btn');
 
+        // Puan Tablosu Fonksiyonları (Firebase Entegrasyonu)
+        async function loadLeaderboard() {
+            const list = document.getElementById('leaderboard-list');
+            list.innerHTML = '<p style="text-align:center; font-size:12px;">Skorlar yükleniyor...</p>';
+            
+            try {
+                // Firebase Firestore'dan skorları çek, puana göre yüksekten düşüğe sırala, ilk 10'u al
+                const q = query(collection(db, "scores"), orderBy("score", "desc"), limit(10));
+                const querySnapshot = await getDocs(q);
 
-        // --- FIREBASE İLE LİDERLİK TABLOSU ---
+                if (querySnapshot.empty) {
+                    list.innerHTML = '<p style="text-align:center; font-size:12px;">Henüz skor kaydedilmemiş.</p>';
+                    return;
+                }
 
-        window.toggleLeaderboard = function() {
+                list.innerHTML = '';
+                let index = 1;
+                querySnapshot.forEach((doc) => {
+                    const item = doc.data();
+                    list.innerHTML += `
+                        <div class="score-item">
+                            <span><strong>${index}.</strong> ${item.name}</span>
+                            <span>${item.score} Puan</span>
+                        </div>
+                    `;
+                    index++;
+                });
+            } catch (error) {
+                console.error("Skorlar çekilirken hata:", error);
+                list.innerHTML = '<p style="text-align:center; font-size:12px; color: red;">Skorlar yüklenirken bir hata oluştu.</p>';
+            }
+        }
+
+        function toggleLeaderboard() {
             const panel = document.getElementById('leaderboard-panel');
             if (panel.style.display === 'none' || panel.style.display === '') {
                 loadLeaderboard();
@@ -812,44 +827,9 @@
             } else {
                 panel.style.display = 'none';
             }
-        };
-
-        function loadLeaderboard() {
-            const list = document.getElementById('leaderboard-list');
-            list.innerHTML = '<p style="text-align:center; font-size:12px;">Yükleniyor...</p>';
-
-            const scoresRef = ref(database, 'scores');
-            
-            // Firebase modüler SDK ile verileri dinleme ve olası iptal/bağlantı hatalarını yakalama
-            onValue(scoresRef, (snapshot) => {
-                list.innerHTML = '';
-                const data = snapshot.val();
-                
-                if (!data) {
-                    list.innerHTML = '<p style="text-align:center; font-size:12px;">Henüz skor kaydedilmemiş.</p>';
-                    return;
-                }
-
-                let scoresArray = [];
-                for (let key in data) {
-                    scoresArray.push(data[key]);
-                }
-
-                scoresArray.sort((a, b) => b.score - a.score).slice(0, 10).forEach((item, index) => {
-                    list.innerHTML += `
-                        <div class="score-item">
-                            <span><strong>${index + 1}.</strong> ${item.name}</span>
-                            <span>${item.score} Puan</span>
-                        </div>
-                    `;
-                });
-            }, (error) => {
-                console.error("Liderlik tablosu hatası:", error);
-                list.innerHTML = '<p style="text-align:center; font-size:12px; color:red;">Veritabanına bağlanılamadı. API anahtarınız kısıtlanmış olabilir.</p>';
-            });
         }
 
-        window.saveScore = function() {
+        async function saveScore() {
             const usernameInput = document.getElementById('username-input');
             const username = usernameInput.value.trim();
             
@@ -858,69 +838,44 @@
                 return;
             }
 
-            const userKey = username.toLowerCase().replace(/\s+/g, '');
-            const userRef = ref(database, 'scores/' + userKey);
-
-            // Modüler SDK ile veri çekme ve güncelleme
-            get(userRef).then((snapshot) => {
-                if (snapshot.exists()) {
-                    let existingScore = snapshot.val().score;
-                    update(userRef, {
-                        score: existingScore + score,
-                        date: new Date().toLocaleDateString()
-                    }).then(() => {
-                        finishSave(usernameInput);
-                    }).catch((error) => {
-                        console.error("Güncelleme Hatası:", error);
-                        alert("Puan kaydedilirken bir hata oluştu. API anahtarınız kısıtlanmış olabilir.");
-                    });
-                } else {
-                    set(userRef, {
-                        name: username,
-                        score: score,
-                        date: new Date().toLocaleDateString()
-                    }).then(() => {
-                        finishSave(usernameInput);
-                    }).catch((error) => {
-                        console.error("Yazma Hatası:", error);
-                        alert("Puan kaydedilirken bir hata oluştu. API anahtarınız kısıtlanmış olabilir.");
-                    });
-                }
-            }).catch((error) => {
-                console.error("Okuma Hatası:", error);
-                alert("Veritabanına ulaşılamadı. API anahtarınız kısıtlanmış olabilir.");
-            });
-        };
-
-        function finishSave(input) {
-            input.value = ""; 
-            window.showMenu();
-            alert("Puanın başarıyla global tabloya eklendi!");
+            try {
+                // Firebase Firestore'a kaydet
+                await addDoc(collection(db, "scores"), {
+                    name: username,
+                    score: score,
+                    date: new Date().toLocaleDateString(),
+                    timestamp: new Date() // Skorları doğru tarih/saat sırasında da tutabilmek için
+                });
+                
+                usernameInput.value = ""; 
+                showMenu();
+                
+            } catch (error) {
+                console.error("Skor kaydedilirken hata:", error);
+                alert("Skor kaydedilirken bir hata oluştu. Lütfen bağlantınızı kontrol edin.");
+            }
         }
 
-        // --- OYUN FONKSİYONLARI ---
-
-        window.initializeGame = function() {
+        // Temel Oyun Fonksiyonları
+        function initializeGame() {
             playSound(clickSound);
             playMenuMusic();
-            
             startScreen.style.display = 'none';
             menuScreen.style.display = 'flex';
-        };
+        }
 
-        window.showMenu = function() {
+        function showMenu() {
             playSound(clickSound);
             gameStarted = false;
             playMenuMusic(); 
-            
             startScreen.style.display = 'none';
             gameScreen.style.display = 'none';
             resultScreen.style.display = 'none';
             subMenuScreen.style.display = 'none';
             menuScreen.style.display = 'flex';
-        };
+        }
 
-        window.showSubMenu = function(category) {
+        function showSubMenu(category) {
             playSound(clickSound);
             menuScreen.style.display = 'none';
             subMenuScreen.style.display = 'flex';
@@ -933,19 +888,19 @@
                 const btn = document.createElement('button');
                 btn.className = 'sub-category-btn' + (sub.id === 'all' ? ' all-btn' : '');
                 btn.innerText = sub.name;
-                btn.onclick = () => window.startGame(category, sub.id, sub.name);
+                btn.onclick = () => startGame(category, sub.id, sub.name);
                 btnContainer.appendChild(btn);
             });
-        };
+        }
 
-        window.startGame = function(category, subCategory, subCategoryName) {
+        function startGame(category, subCategory, subCategoryName) {
             playSound(clickSound);
             
             if(subCategory === 'all' || !subCategory) {
-                currentQuestions = [...db[category]];
+                currentQuestions = [...mapDB[category]];
                 currentCategoryName = categoryNames[category] + " (Karma)";
             } else {
-                currentQuestions = db[category].filter(q => q.type === subCategory);
+                currentQuestions = mapDB[category].filter(q => q.type === subCategory);
                 currentCategoryName = subCategoryName;
             }
 
@@ -956,7 +911,6 @@
             
             gameStarted = true;
             stopMenuMusic(); 
-
             currentQuestions.sort(() => Math.random() - 0.5);
             currentIndex = 0;
             score = 0;
@@ -971,7 +925,7 @@
             gameScreen.style.display = 'flex';
             
             loadQuestion();
-        };
+        }
 
         function loadQuestion() {
             nextBtn.style.display = 'none';
@@ -993,7 +947,7 @@
             updateScoreBoard();
         }
 
-        window.checkAnswer = function(selectedIndex) {
+        function checkAnswer(selectedIndex) {
             const q = currentQuestions[currentIndex];
             const isCorrect = (selectedIndex === q.correctIndex);
             
@@ -1016,9 +970,9 @@
             
             updateScoreBoard();
             nextBtn.style.display = 'block'; 
-        };
+        }
 
-        window.nextQuestion = function() {
+        function nextQuestion() {
             playSound(clickSound);
             currentIndex++;
             if (currentIndex < currentQuestions.length) {
@@ -1026,7 +980,7 @@
             } else {
                 endGame();
             }
-        };
+        }
 
         function updateScoreBoard() {
             document.getElementById('score-display').innerText = 
@@ -1039,13 +993,18 @@
             document.getElementById('final-score').innerText = `Toplam Puanınız: ${score}`;
         }
 
-        document.getElementById('map-container').addEventListener('click', function(e) {
-            const rect = this.getBoundingClientRect();
-            const x = ((e.clientX - rect.left) / rect.width) * 100;
-            const y = ((e.clientY - rect.top) / rect.height) * 100;
-            
-            console.log(`x: ${x.toFixed(1)}, y: ${y.toFixed(1)}`);
-        });
+        // HTML içindeki "onclick" niteliklerinin modül içindeki fonksiyonları görebilmesi için Window nesnesine atıyoruz
+        window.toggleSettings = toggleSettings;
+        window.toggleMusic = toggleMusic;
+        window.toggleSound = toggleSound;
+        window.toggleLeaderboard = toggleLeaderboard;
+        window.initializeGame = initializeGame;
+        window.showMenu = showMenu;
+        window.showSubMenu = showSubMenu;
+        window.startGame = startGame;
+        window.checkAnswer = checkAnswer;
+        window.nextQuestion = nextQuestion;
+        window.saveScore = saveScore;
 
     </script>
 </body>

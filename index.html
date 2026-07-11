@@ -42,6 +42,130 @@
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        /* Puan Tablosu İkonu ve Modalı */
+        .trophy-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            font-size: 30px;
+            cursor: pointer;
+            background: rgba(255, 215, 0, 0.2);
+            padding: 10px;
+            border-radius: 50%;
+            border: 2px solid #f1c40f;
+            transition: transform 0.3s, background 0.3s;
+            z-index: 100;
+        }
+
+        .trophy-btn:hover {
+            transform: scale(1.1);
+            background: rgba(255, 215, 0, 0.4);
+        }
+
+        #leaderboard-panel {
+            display: none;
+            position: absolute;
+            top: 20px;
+            left: 80px;
+            background: white;
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            padding: 15px;
+            width: 250px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 101;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        #leaderboard-panel h3 {
+            margin-top: 0;
+            text-align: center;
+            color: var(--primary);
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 10px;
+        }
+
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        .score-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Ayarlar İkonu ve Modalı */
+        .settings-icon-btn {
+            position: fixed;
+            top: 80px;
+            left: 20px;
+            font-size: 30px;
+            cursor: pointer;
+            background: rgba(52, 152, 219, 0.2);
+            padding: 10px;
+            border-radius: 50%;
+            border: 2px solid #3498db;
+            transition: transform 0.3s, background 0.3s;
+            z-index: 100;
+        }
+
+        .settings-icon-btn:hover {
+            transform: scale(1.1);
+            background: rgba(52, 152, 219, 0.4);
+        }
+
+        #settings-panel {
+            display: none;
+            position: absolute;
+            top: 80px;
+            left: 80px;
+            background: white;
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            padding: 15px;
+            width: 200px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 101;
+        }
+
+        #settings-panel h3 {
+            margin-top: 0;
+            text-align: center;
+            color: var(--primary);
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 10px;
+        }
+
+        .settings-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: var(--light);
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .setting-btn {
+            padding: 8px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .setting-btn.off {
+            background-color: var(--wrong);
         }
 
         /* Başlangıç Ekranı */
@@ -234,18 +358,29 @@
             flex-direction: column;
             gap: 20px;
             padding: 20px 0;
+            align-items: center;
+        }
+
+        .username-input {
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid var(--accent);
+            border-radius: 5px;
+            width: 80%;
+            max-width: 300px;
+            text-align: center;
         }
 
         .home-btn {
-            padding: 8px 16px;
-            font-size: 12px;
+            padding: 10px 20px;
+            font-size: 14px;
             font-weight: bold;
             background-color: var(--accent);
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            margin: 0 auto;
+            transition: background 0.2s;
         }
         
         .home-btn:hover { background-color: #2980b9; }
@@ -286,9 +421,35 @@
 
     <div id="app-container">
         
+        <!-- Puan Tablosu İkonu ve Paneli -->
+        <div class="trophy-btn" onclick="toggleLeaderboard()" title="Puan Tablosu">🏆</div>
+        <div id="leaderboard-panel">
+            <h3>Puan Tablosu</h3>
+            <div id="leaderboard-list">
+                <!-- Skorlar buraya JS ile eklenecek -->
+            </div>
+            <div style="text-align: center; margin-top: 10px;">
+                <button class="home-btn" style="padding: 5px 10px; font-size: 12px;" onclick="toggleLeaderboard()">Kapat</button>
+            </div>
+        </div>
+
+        <!-- Ayarlar İkonu ve Paneli -->
+        <div class="settings-icon-btn" onclick="toggleSettings()" title="Ayarlar">⚙️</div>
+        <div id="settings-panel">
+            <h3>Ayarlar</h3>
+            <div class="settings-container">
+                <button id="music-btn" class="setting-btn" onclick="toggleMusic()">🎵 Müzik: Açık</button>
+                <button id="sound-btn" class="setting-btn" onclick="toggleSound()">🔊 Sesler: Açık</button>
+            </div>
+            <div style="text-align: center; margin-top: 10px;">
+                <button class="home-btn" style="padding: 5px 10px; font-size: 12px;" onclick="toggleSettings()">Kapat</button>
+            </div>
+        </div>
+
         <div id="start-screen">
             <h2>Türkiye Coğrafyasını Keşfetmeye Hazır mısın?</h2>
-            <button class="ready-btn" onclick="showMenu()">Başla</button>
+            <!-- Kullanıcı onayı akışına uygun evet butonu -->
+            <button class="ready-btn" onclick="initializeGame()">Evet</button>
         </div>
 
         <div id="menu-screen">
@@ -330,7 +491,9 @@
         <div id="result-screen">
             <h2>🎉 Oyun Bitti!</h2>
             <h3 id="final-score" style="font-size: 24px; color: var(--primary);">Puanınız: 0</h3>
-            <button class="home-btn" onclick="showMenu()">Ana Menüye Dön</button>
+            
+            <input type="text" id="username-input" class="username-input" placeholder="Adınızı giriniz..." maxlength="15">
+            <button class="home-btn" onclick="saveScore()" style="margin-top: 10px; background-color: var(--correct);">Kaydet ve Menüye Dön</button>
         </div>
     </div>
 
@@ -340,15 +503,71 @@
     </div>
 
     <script>
-        // --- SES EFEKTLERİ ---
+        // --- SES VE MÜZİK AYARLARI ---
         const clickSound = new Audio('menuses.mp3');
-        const correctSound = new Audio('dogrucevap.mp3'); // Doğru cevap efekti
-        const wrongSound = new Audio('yanliscevap.mp3'); // Yanlış cevap efekti
+        const correctSound = new Audio('dogrucevap.mp3'); 
+        const wrongSound = new Audio('yanliscevap.mp3'); 
+        
+        // Ana Menü Müziği
+        const bgMusic = new Audio('menumuzik.mp3');
+        bgMusic.loop = true; 
+        bgMusic.volume = 0.5;
 
-        // Sesi sorunsuz çalmak için yardımcı fonksiyon
+        let isMusicOn = true;
+        let isSoundOn = true;
+        let gameStarted = false;
+
+        function toggleSettings() {
+            const panel = document.getElementById('settings-panel');
+            if (panel.style.display === 'none' || panel.style.display === '') {
+                panel.style.display = 'block';
+                // Puan tablosu açıksa çakışmayı önlemek için kapat
+                document.getElementById('leaderboard-panel').style.display = 'none';
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+
+        function toggleMusic() {
+            isMusicOn = !isMusicOn;
+            const btn = document.getElementById('music-btn');
+            if(isMusicOn) {
+                btn.innerText = "🎵 Müzik: Açık";
+                btn.classList.remove('off');
+                if(!gameStarted) bgMusic.play().catch(e => console.log(e));
+            } else {
+                btn.innerText = "🔇 Müzik: Kapalı";
+                btn.classList.add('off');
+                bgMusic.pause();
+            }
+        }
+
+        function toggleSound() {
+            isSoundOn = !isSoundOn;
+            const btn = document.getElementById('sound-btn');
+            if(isSoundOn) {
+                btn.innerText = "🔊 Sesler: Açık";
+                btn.classList.remove('off');
+            } else {
+                btn.innerText = "🔇 Sesler: Kapalı";
+                btn.classList.add('off');
+            }
+        }
+
         function playSound(sound) {
-            sound.currentTime = 0; // Sesi başa sar (peş peşe tıklamalar için)
-            sound.play().catch(err => console.log("Ses çalma engellendi veya hata oluştu:", err));
+            if(!isSoundOn) return;
+            sound.currentTime = 0; 
+            sound.play().catch(err => console.log("Ses çalma engellendi:", err));
+        }
+
+        function playMenuMusic() {
+            if(isMusicOn) {
+                bgMusic.play().catch(err => console.log("Müzik otomatik başlatılamadı:", err));
+            }
+        }
+
+        function stopMenuMusic() {
+            bgMusic.pause();
         }
 
         // Görseldeki (1000005216.png) harita boşluklarına göre tam kalibre edilmiş DB
@@ -364,7 +583,7 @@
                 { answer: "Bolkar", type: "kivrimli", x: 43.5, y: 79.0, options: ["Uludağ", "Aydın Dağları", "Bolkar", "Nemrut"] },
                 { answer: "Menteşe", type: "kirik", x: 16.5, y: 69.0, options: ["Manisa(Kula)", "Kaz Dağları", "Hasan", "Menteşe"] },
                 { answer: "Hasan", type: "volkanik", x: 42.8, y: 61.7, options: ["Uludağ", "Tecer", "Hasan", "Nemrut"] },
-                { answer: "Yunt", type: "kirik", x: 12.0, y: 48.0, options: ["Allahuekber", "Canik", "Karadağ", "Yunt"] },
+                { answer: "Yunt", type: "kirik", x: 14.5, y: 54.0, options: ["Allahuekber", "Canik", "Karadağ", "Yunt"] },
                 { answer: "Palandöken", type: "kivrimli", x: 75.5, y: 39.5, options: ["Erciyes", "Palandöken", "Ilgaz Dağları", "Cilo(Buzul) Dağı"] },
                 { answer: "Madra", type: "kirik", x: 11.6, y: 43.0, options: ["Madra", "Tendürek", "Mercan Dağları", "Menteşe"] },
                 { answer: "Tendürek", type: "volkanik", x: 87.0, y: 45.0, options: ["Karacadağ", "Kaz Dağları", "Tendürek", "Nemrut"] },
@@ -553,8 +772,76 @@
         const marker = document.getElementById('marker');
         const nextBtn = document.getElementById('next-btn');
 
+        // Puan Tablosu Fonksiyonları
+        function toggleLeaderboard() {
+            const panel = document.getElementById('leaderboard-panel');
+            if (panel.style.display === 'none' || panel.style.display === '') {
+                loadLeaderboard();
+                panel.style.display = 'block';
+                // Puan tablosu açıldığında ayarlar paneli açıksa kapat
+                document.getElementById('settings-panel').style.display = 'none';
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+
+        function loadLeaderboard() {
+            const list = document.getElementById('leaderboard-list');
+            list.innerHTML = '';
+            let scores = JSON.parse(localStorage.getItem('cografya_scores')) || [];
+            
+            if (scores.length === 0) {
+                list.innerHTML = '<p style="text-align:center; font-size:12px;">Henüz skor kaydedilmemiş.</p>';
+                return;
+            }
+
+            // Puanları en yüksekten en düşüğe sırala ve ilk 10'u göster
+            scores.sort((a, b) => b.score - a.score).slice(0, 10).forEach((item, index) => {
+                list.innerHTML += `
+                    <div class="score-item">
+                        <span><strong>${index + 1}.</strong> ${item.name}</span>
+                        <span>${item.score} Puan</span>
+                    </div>
+                `;
+            });
+        }
+
+        function saveScore() {
+            const usernameInput = document.getElementById('username-input');
+            const username = usernameInput.value.trim();
+            
+            if (!username) {
+                alert("Puanınızı kaydetmek için bir ad giriniz!");
+                return;
+            }
+
+            let scores = JSON.parse(localStorage.getItem('cografya_scores')) || [];
+            scores.push({
+                name: username,
+                score: score,
+                date: new Date().toLocaleDateString()
+            });
+            
+            localStorage.setItem('cografya_scores', JSON.stringify(scores));
+            
+            usernameInput.value = ""; // Alanı temizle
+            showMenu();
+        }
+
+        // Oyunu Başlatan Fonksiyon ("Evet" Butonu İçin)
+        function initializeGame() {
+            playSound(clickSound);
+            playMenuMusic();
+            
+            startScreen.style.display = 'none';
+            menuScreen.style.display = 'flex';
+        }
+
         function showMenu() {
             playSound(clickSound);
+            gameStarted = false;
+            playMenuMusic(); 
+            
             startScreen.style.display = 'none';
             gameScreen.style.display = 'none';
             resultScreen.style.display = 'none';
@@ -596,6 +883,9 @@
                 return;
             }
             
+            gameStarted = true;
+            stopMenuMusic();
+
             currentQuestions.sort(() => Math.random() - 0.5);
             currentIndex = 0;
             score = 0;
@@ -646,11 +936,11 @@
             if (isCorrect) {
                 selectedBtn.classList.add('correct');
                 score += 10;
-                playSound(correctSound); // Doğru sesini çal
+                playSound(correctSound); 
             } else {
                 selectedBtn.classList.add('wrong');
                 correctBtn.classList.add('correct'); 
-                playSound(wrongSound); // Yanlış sesini çal
+                playSound(wrongSound); 
             }
             
             updateScoreBoard();
@@ -684,8 +974,6 @@
             const x = ((e.clientX - rect.left) / rect.width) * 100;
             const y = ((e.clientY - rect.top) / rect.height) * 100;
             
-            // Tıkladığınız yerin koordinatlarını ekranda uyarı olarak gösterir
-            alert(`Bu noktanın koordinatı:\nx: ${x.toFixed(1)}, y: ${y.toFixed(1)}`);
             console.log(`x: ${x.toFixed(1)}, y: ${y.toFixed(1)}`);
         });
 

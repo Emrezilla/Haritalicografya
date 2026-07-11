@@ -14,33 +14,40 @@
             --light: #ecf0f1;
         }
 
+        /* Tüm elementlerin genişlik ve yükseklik hesaplamasına iç boşlukları dahil et */
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
             background-size: cover;
             color: var(--primary);
             margin: 0;
-            padding: 20px;
+            padding: 10px; /* Küçültüldü */
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
+            min-height: 100dvh; /* Mobil tarayıcılar için vh yerine dvh kullanıldı */
+            overflow-x: hidden;
         }
 
         h1 {
             text-align: center;
             color: white;
-            font-size: 36px;
+            font-size: 26px; /* Ekrandan tasarruf için küçültüldü */
             text-shadow: 2px 2px 6px rgba(0,0,0,0.8);
-            margin-bottom: 20px;
+            margin-top: 10px;
+            margin-bottom: 15px; /* Küçültüldü */
         }
 
-        /* Beyaz arka plan kaldırıldı ve ekranın tamamını kaplaması sağlandı */
         #app-container {
             width: 100%;
             max-width: 1000px;
             background: transparent;
             padding: 10px;
+            padding-bottom: 45px; /* Geliştirici yazısının butonları örtmemesi için alt boşluk eklendi */
             position: relative;
             display: flex;
             flex-direction: column;
@@ -49,21 +56,24 @@
             flex-grow: 1;
         }
 
-        /* Okunabilirliği artırmak için beyaz yazılara gölge eklendi */
         h2, h3, #category-title, #score-display {
             color: white;
             text-shadow: 2px 2px 5px rgba(0,0,0,0.8);
+        }
+        
+        h2 {
+            font-size: 20px;
         }
 
         /* Puan Tablosu İkonu ve Modalı */
         .trophy-btn {
             position: fixed;
-            top: 20px;
-            left: 20px;
-            font-size: 20px; /* Küçültüldü */
+            top: 10px;
+            left: 10px;
+            font-size: 18px; 
             cursor: pointer;
             background: rgba(255, 215, 0, 0.2);
-            padding: 8px; /* Küçültüldü */
+            padding: 6px; 
             border-radius: 50%;
             border: 2px solid #f1c40f;
             transition: transform 0.3s, background 0.3s;
@@ -78,8 +88,8 @@
         #leaderboard-panel {
             display: none;
             position: absolute;
-            top: 20px;
-            left: 70px;
+            top: 15px;
+            left: 60px;
             background: white;
             border: 2px solid var(--accent);
             border-radius: 8px;
@@ -95,7 +105,7 @@
             margin-top: 0;
             text-align: center;
             color: var(--primary);
-            text-shadow: none; /* Panel içindeki yazı okunaklı kalsın */
+            text-shadow: none; 
             border-bottom: 2px solid var(--light);
             padding-bottom: 10px;
         }
@@ -116,12 +126,12 @@
         /* Ayarlar İkonu ve Modalı */
         .settings-icon-btn {
             position: fixed;
-            top: 70px; /* Boyuta göre ayarlandı */
-            left: 20px;
-            font-size: 20px; /* Küçültüldü */
+            top: 55px; 
+            left: 10px;
+            font-size: 18px; 
             cursor: pointer;
             background: rgba(52, 152, 219, 0.2);
-            padding: 8px; /* Küçültüldü */
+            padding: 6px; 
             border-radius: 50%;
             border: 2px solid #3498db;
             transition: transform 0.3s, background 0.3s;
@@ -136,8 +146,8 @@
         #settings-panel {
             display: none;
             position: absolute;
-            top: 70px;
-            left: 70px;
+            top: 55px;
+            left: 60px;
             background: white;
             border: 2px solid var(--accent);
             border-radius: 8px;
@@ -188,13 +198,13 @@
             align-items: center;
             text-align: center;
             gap: 15px;
-            padding: 40px 0;
+            padding: 20px 0;
             width: 100%;
         }
 
         .ready-btn {
-            padding: 20px 60px;
-            font-size: 26px;
+            padding: 15px 50px;
+            font-size: 24px;
             font-weight: bold;
             background-color: var(--correct);
             color: white;
@@ -215,7 +225,7 @@
         #menu-screen {
             display: none;
             flex-direction: column;
-            gap: 15px;
+            gap: 10px; /* Buton aralıkları küçültüldü */
             width: 100%;
             max-width: 400px;
         }
@@ -224,15 +234,15 @@
         #sub-menu-screen {
             display: none;
             flex-direction: column;
-            gap: 15px;
+            gap: 10px; /* Buton aralıkları küçültüldü */
             width: 100%;
             max-width: 400px;
             margin: 0 auto;
         }
 
         .category-btn {
-            padding: 15px;
-            font-size: 18px;
+            padding: 12px; /* Dikey alan kazanmak için küçültüldü */
+            font-size: 16px;
             font-weight: bold;
             color: white;
             border: none;
@@ -248,8 +258,8 @@
         }
 
         .sub-category-btn {
-            padding: 12px;
-            font-size: 16px;
+            padding: 10px; /* Dikey alan kazanmak için küçültüldü */
+            font-size: 14px;
             font-weight: bold;
             color: white;
             background-color: var(--secondary);
@@ -267,7 +277,7 @@
 
         .sub-category-btn.all-btn {
             background-color: var(--accent);
-            margin-top: 10px;
+            margin-top: 5px;
         }
 
         /* Kategori Renkleri */
@@ -281,7 +291,7 @@
         #game-screen {
             display: none;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px; /* Aralıklar küçültüldü */
             width: 100%;
         }
 
@@ -289,10 +299,10 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             border-bottom: 2px solid rgba(255,255,255,0.3);
-            padding-bottom: 10px;
+            padding-bottom: 8px;
             width: 100%;
         }
 
@@ -300,7 +310,7 @@
             background-color: var(--wrong);
             color: white;
             border: none;
-            padding: 12px 16px;
+            padding: 10px 14px;
             border-radius: 3px;
             cursor: pointer;
             font-size: 10px;
@@ -349,13 +359,13 @@
         #options-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 10px; /* Boşluklar azaltıldı */
             width: 100%;
         }
 
         .option-btn {
-            padding: 15px;
-            font-size: 16px;
+            padding: 12px; /* Dikey alan kazancı */
+            font-size: 14px;
             font-weight: bold;
             background-color: var(--secondary);
             color: white;
@@ -412,18 +422,19 @@
 
         .developer-credit {
             position: fixed;
-            bottom: 5px;
-            right: 5px;
-            background-color: rgba(0, 0, 0, 0.7);
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
             color: white;
-            padding: 4px 8px;
-            border-radius: 10px;
-            font-size: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            padding: 6px;
+            font-size: 11px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
             z-index: 1000;
             display: flex;
             align-items: center;
-            gap: 5px;
+            justify-content: center; /* Merkeze hizalandı */
+            gap: 8px;
         }
 
         .developer-credit a {
@@ -446,19 +457,16 @@
 
     <div id="app-container">
         
-        <!-- Puan Tablosu İkonu ve Paneli -->
         <div class="trophy-btn" onclick="toggleLeaderboard()" title="Puan Tablosu">🏆</div>
         <div id="leaderboard-panel">
             <h3>Puan Tablosu</h3>
             <div id="leaderboard-list">
-                <!-- Skorlar buraya JS ile eklenecek -->
-            </div>
+                </div>
             <div style="text-align: center; margin-top: 10px;">
                 <button class="home-btn" style="padding: 5px 10px; font-size: 12px;" onclick="toggleLeaderboard()">Kapat</button>
             </div>
         </div>
 
-        <!-- Ayarlar İkonu ve Paneli -->
         <div class="settings-icon-btn" onclick="toggleSettings()" title="Ayarlar">⚙️</div>
         <div id="settings-panel">
             <h3>Ayarlar</h3>
@@ -473,7 +481,6 @@
 
         <div id="start-screen">
             <h2>Türkiye Coğrafyasını Keşfetmeye Hazır mısın?</h2>
-            <!-- Kullanıcı onayı akışına uygun evet butonu -->
             <button class="ready-btn" onclick="initializeGame()">Evet</button>
         </div>
 
@@ -488,8 +495,8 @@
 
         <div id="sub-menu-screen">
             <h2 id="sub-menu-title" style="text-align: center; margin-top: 0;">Alt Kategori Seçiniz</h2>
-            <div id="sub-menu-buttons" style="display: flex; flex-direction: column; gap: 10px;"></div>
-            <button class="back-menu-btn" onclick="showMenu()" style="margin-top: 15px;">🔙 Ana Menüye Dön</button>
+            <div id="sub-menu-buttons" style="display: flex; flex-direction: column; gap: 8px;"></div>
+            <button class="back-menu-btn" onclick="showMenu()" style="margin-top: 10px;">🔙 Ana Menüye Dön</button>
         </div>
 
         <div id="game-screen">
@@ -529,8 +536,6 @@
 
     <script>
         // --- SES VE MÜZİK AYARLARI ---
-        // Menumuzik.mp3 yerine farklı ve doğru bir tıklama sesi atanmalıdır.
-        // Aksi takdirde müziği her menü butonuna bastığınızda resetler!
         const clickSound = new Audio('menuses.mp3'); 
         const correctSound = new Audio('dogrucevap.mp3'); 
         const wrongSound = new Audio('yanliscevap.mp3'); 
@@ -597,7 +602,7 @@
             bgMusic.pause();
         }
 
-        // Görseldeki (1000005216.png) harita boşluklarına göre tam kalibre edilmiş DB
+        // DB
         const db = {
             daglar: [
                 { answer: "Ağrı Dağı", type: "volkanik", x: 88.0, y: 40.0, options: ["Tecer", "Ağrı Dağı", "Ilgaz Dağı", "Kaçkar Dağı"] },
